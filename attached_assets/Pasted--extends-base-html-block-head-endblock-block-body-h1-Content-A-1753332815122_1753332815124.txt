@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<h1>Content Analysis</h1>
+<div style="max-width: 900px; margin: 0 auto;">
+    <label for="text-input" style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Enter Text</label>
+    <textarea id="text-input" rows="10" style="width: 100%; max-width: 100%; resize: none; padding: 1rem; font-size: 1.1rem; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 2rem;"></textarea>
+    <div id="stats-container" style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between;">
+        <div class="stat-box">
+            <div class="stat-label">Words</div>
+            <div class="stat-value" id="word-count">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Sentences</div>
+            <div class="stat-value" id="sentence-count">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Characters</div>
+            <div class="stat-value" id="character-count">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Paragraphs</div>
+            <div class="stat-value" id="paragraph-count">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Syllables</div>
+            <div class="stat-value" id="syllable-count">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Reading Time</div>
+            <div class="stat-value" id="reading-time">0 min</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Speaking Time</div>
+            <div class="stat-value" id="speaking-time">0 min</div>
+        </div>
+    </div>
+</div>
+
+<script>
+function countWords(text) {
+    return (text.match(/\b\w+\b/g) || []).length;
+}
+function countSentences(text) {
+    return (text.match(/([.!?]+)(?=\s|$)/g) || []).length || (text.trim() ? 1 : 0);
+}
+function countCharacters(text) {
+    return text.replace(/\s/g, '').length;
+}
+function countParagraphs(text) {
+    return (text.trim().split(/\n+/).filter(p => p.trim().length > 0)).length;
+}
+function countSyllables(text) {
+    // Simple syllable estimation
+    return (text.toLowerCase().match(/[aeiouy]{1,2}/g) || []).length;
+}
+function calcReadingTime(words) {
+    return words > 0 ? (words / 200).toFixed(2) : '0';
+}
+function calcSpeakingTime(words) {
+    return words > 0 ? (words / 130).toFixed(2) : '0';
+}
+
+const textarea = document.getElementById('text-input');
+const wordCount = document.getElementById('word-count');
+const sentenceCount = document.getElementById('sentence-count');
+const characterCount = document.getElementById('character-count');
+const paragraphCount = document.getElementById('paragraph-count');
+const syllableCount = document.getElementById('syllable-count');
+const readingTime = document.getElementById('reading-time');
+const speakingTime = document.getElementById('speaking-time');
+
+function updateStats() {
+    const text = textarea.value;
+    const words = countWords(text);
+    const sentences = countSentences(text);
+    const characters = countCharacters(text);
+    const paragraphs = countParagraphs(text);
+    const syllables = countSyllables(text);
+    const readTime = calcReadingTime(words);
+    const speakTime = calcSpeakingTime(words);
+
+    wordCount.textContent = words;
+    sentenceCount.textContent = sentences;
+    characterCount.textContent = characters;
+    paragraphCount.textContent = paragraphs;
+    syllableCount.textContent = syllables;
+    readingTime.textContent = `${readTime} min`;
+    speakingTime.textContent = `${speakTime} min`;
+}
+
+textarea.addEventListener('input', updateStats);
+window.addEventListener('DOMContentLoaded', updateStats);
+</script>
+
+<style>
+#stats-container {
+    margin-top: 1rem;
+}
+.stat-box {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1.2rem 2rem;
+    min-width: 120px;
+    flex: 1 1 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.stat-label {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4f46e5;
+}
+@media (max-width: 900px) {
+  #stats-container {
+    flex-direction: column;
+    gap: 1rem !important;
+  }
+  .stat-box {
+    width: 100% !important;
+    min-width: unset;
+    margin-bottom: 0.5rem !important;
+  }
+}
+</style>
+
+{% endblock %}
